@@ -1,0 +1,17 @@
+version: "3"
+
+services:
+    tf:
+        container_name: scc-tf
+        build: .
+        restart: unless-stopped
+        ports:
+            - "1453:8888"
+        volumes:
+            - "./:/tf/dv"
+        deploy:
+            resources:
+                reservations:
+                    devices:
+                        - driver: nvidia
+                          capabilities: [gpu]
