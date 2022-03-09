@@ -3,7 +3,7 @@ version: "3"
 services:
     tf:
         container_name: scc-tf
-        images: zxc25077667/deep-version:latest
+        image: zxc25077667/deep-version:latest
         restart: unless-stopped
         ports:
             - "1453:8888"
