@@ -43,8 +43,18 @@ class DataLoader:
         #       - build_batch_iterator                                         #
         #     in section 1 of the notebook.                                    #
         ########################################################################
-
-        pass
+        
+        f = np.random.permutation if self.shuffle else range
+        iterator = iter(f(len(self.dataset)))
+        
+        batch = []
+        for i in iterator:
+            batch.append(self.dataset[i]['data'])
+            if len(batch) == self.batch_size:
+                yield {'data' : np.array(batch)}
+                batch = [] # new batch
+        if not self.drop_last and len(batch) != 0:
+            yield {'data' : np.array(batch)}
 
         ########################################################################
         #                           END OF YOUR CODE                           #
@@ -59,7 +69,9 @@ class DataLoader:
         # Don't forget to check for drop last!                                 #
         ########################################################################
 
-        pass
+        length = len(self.dataset) // self.batch_size
+        if not self.drop_last and (len(self.dataset) % self.batch_size != 0):
+            length += 1
 
         ########################################################################
         #                           END OF YOUR CODE                           #
