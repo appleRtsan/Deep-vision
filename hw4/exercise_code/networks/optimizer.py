@@ -22,8 +22,7 @@ class Optimizer(object):
         # Implement the gradient descent for 1 step to compute the weight      #
         ########################################################################
 
-
-        pass
+        weight -= self.lr * dw
 
         ########################################################################
         #                           END OF YOUR CODE                           #
