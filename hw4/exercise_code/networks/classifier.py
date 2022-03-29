@@ -53,8 +53,7 @@ class Classifier(Network):
         # that you need to implement the function self.sigmoid() for that      #
         ########################################################################
 
-
-        pass
+        y = self.sigmoid(np.matmul(X, self.W))
 
         ########################################################################
         #                           END OF YOUR CODE                           #
@@ -80,8 +79,7 @@ class Classifier(Network):
         # expressed by sigmoid itself                                          #
         ########################################################################
 
-
-        pass
+        dW = (y * (1-y)) * self.cache
 
         ########################################################################
         #                           END OF YOUR CODE                           #
@@ -103,8 +101,7 @@ class Classifier(Network):
         # Implement the sigmoid function, return out                           #
         ########################################################################
 
-
-        pass
+        out = 1 / (1 + np.exp(-x))
 
         ########################################################################
         #                           END OF YOUR CODE                           #
