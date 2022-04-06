@@ -132,7 +132,9 @@ class LeakyRelu:
         # TODO:                                                                #
         # Implement the forward pass of LeakyRelu activation function          #
         ########################################################################
-
+        cache = np.array(x)
+        outputs = np.array(x)
+        outputs[x < 0] *= self.slope
         ########################################################################
         #                           END OF YOUR CODE                           #
         ########################################################################
@@ -147,7 +149,9 @@ class LeakyRelu:
         # TODO:                                                                #
         # Implement the backward pass of LeakyRelu activation function         #
         ########################################################################
-
+        cache[cache > 0] = 1
+        cache[cache < 0] = self.slope
+        dx = cache * dout
         ########################################################################
         #                           END OF YOUR CODE                           #
         ########################################################################
@@ -171,7 +175,8 @@ class Tanh:
         # TODO:                                                                #
         # Implement the forward pass of Tanh activation function               #
         ########################################################################
-
+        outputs = 2 / (1 + np.exp(-2 * x)) - 1
+        cache = np.array(outputs)
         ########################################################################
         #                           END OF YOUR CODE                           #
         ########################################################################
@@ -186,7 +191,7 @@ class Tanh:
         # TODO:                                                                #
         # Implement the backward pass of Tanh activation function              #
         ########################################################################
-
+        dx = (1-cache**2) * dout
         ########################################################################
         #                           END OF YOUR CODE                           #
         ########################################################################
