@@ -3,3 +3,7 @@ sklearn==0.0
 tqdm==4.63.0
 seaborn==0.11.2
 pytorch-lightning==1.6.1
+-f https://download.pytorch.org/whl/torch_stable.html 
+torch==1.11.0+cu113
+-f https://download.pytorch.org/whl/torch_stable.html 
+torchvision==0.12.0+cu113
