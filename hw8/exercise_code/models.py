@@ -26,8 +26,12 @@ class Encoder(nn.Module):
         # TODO: Initialize your encoder!                                         #
         ########################################################################
 
-
-        pass
+        self.encoder = nn.Sequential(
+            nn.Linear(input_size, self.hparams['n_hidden'][0]),
+            nn.Linear(self.hparams['n_hidden'][0], self.hparams['n_hidden'][1]),
+            nn.LeakyReLU(),
+            nn.Linear(self.hparams['n_hidden'][1], latent_dim),
+        )
 
         ########################################################################
         #                           END OF YOUR CODE                           #
@@ -51,8 +55,12 @@ class Decoder(nn.Module):
         # TODO: Initialize your decoder!                                       #
         ########################################################################
 
-
-        pass
+        self.decoder = nn.Sequential(
+            nn.Linear(latent_dim, self.hparams['n_hidden'][1]),
+            nn.Linear(self.hparams['n_hidden'][1], self.hparams['n_hidden'][0]),
+            nn.LeakyReLU(),
+            nn.Linear(self.hparams['n_hidden'][0], output_size)
+        )
 
         ########################################################################
         #                           END OF YOUR CODE                           #
@@ -67,13 +75,13 @@ class Autoencoder(pl.LightningModule):
 
     def __init__(self, hparams, encoder, decoder, train_set, val_set, logger):
         super().__init__()
-        self.hparams = hparams
+        self.hparams.update(hparams)
         # set hyperparams
         self.encoder = encoder
         self.decoder = decoder
         self.train_set = train_set
         self.val_set = val_set
-        self.logger = logger
+        self.logger_ = logger
 
     def forward(self, x):
         reconstruction = None
@@ -83,8 +91,8 @@ class Autoencoder(pl.LightningModule):
         #  of the input.                                                       #
         ########################################################################
 
-
-        pass
+        x = self.encoder(x)
+        reconstruction = self.decoder(x)
 
         ########################################################################
         #                           END OF YOUR CODE                           #
@@ -144,8 +152,7 @@ class Autoencoder(pl.LightningModule):
         # TODO: Define your optimizer.                                         #
         ########################################################################
 
-
-        pass
+        optim = torch.optim.Adam(self.parameters(), lr=0.001)
 
         ########################################################################
         #                           END OF YOUR CODE                           #
@@ -177,7 +184,7 @@ class Classifier(pl.LightningModule):
     def __init__(self, hparams, encoder, train_set=None, val_set=None, test_set=None):
         super().__init__()
         # set hyperparams
-        self.hparams = hparams
+        self.hparams.update(hparams)
         self.encoder = encoder
         self.model = nn.Identity()
         self.data = {'train': train_set,
@@ -189,8 +196,13 @@ class Classifier(pl.LightningModule):
         # of your encoder                                                      #
         ########################################################################
 
-
-        pass
+        self.model = nn.Sequential(
+            nn.Linear(encoder.latent_dim, self.hparams['n_hidden'][0]),
+            nn.LeakyReLU(),
+            nn.Linear(self.hparams['n_hidden'][0], self.hparams['n_hidden'][1]),
+            nn.LeakyReLU(),
+            nn.Linear(self.hparams['n_hidden'][1], 10)
+        )
 
         ########################################################################
         #                           END OF YOUR CODE                           #
@@ -258,8 +270,7 @@ class Classifier(pl.LightningModule):
         # TODO: Define your optimizer.                                         #
         ########################################################################
 
-
-        pass
+        optim = torch.optim.Adam(self.parameters(), lr=0.001)
 
         ########################################################################
         #                           END OF YOUR CODE                           #
