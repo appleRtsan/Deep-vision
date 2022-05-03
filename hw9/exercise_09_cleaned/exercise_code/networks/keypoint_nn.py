@@ -13,7 +13,7 @@ class KeypointModel(pl.LightningModule):
             arguments), otherwise it might not work on the submission server
         """
         super(KeypointModel, self).__init__()
-        self.hparams = hparams
+        self.hparams.update(hparams)
         ########################################################################
         # TODO: Define all the layers of your CNN, the only requirements are:  #
         # 1. The network takes in a batch of images of shape (Nx1x96x96)       #
@@ -27,8 +27,46 @@ class KeypointModel(pl.LightningModule):
         # overfitting.                                                         #
         ########################################################################
 
+        output_size_checker = torch.zeros(*hparams['input_shape'])
+        
+        self.conv2d = [
+            nn.Sequential(
+                nn.Conv2d(i, o, kernel_size=3, padding=1),
+                nn.LeakyReLU(0.3),
+                nn.MaxPool2d(kernel_size=2, stride=2)
+            )
+            for i, o in zip(hparams['n_input_channel'], hparams['n_output_channel'])
+        ]
+        for i in range(len(self.conv2d)):
+            setattr(self, 'conv2d_'+str(i), self.conv2d[i])
+        
+        self.flatten = nn.Flatten()
+        
+        # ====== check flatten layer output size (just lazy to calculate) =====
+        for c in self.conv2d:
+            output_size_checker = c(output_size_checker)
+        output_size_checker = self.flatten(output_size_checker)
 
-        pass
+        flatten_output_size = output_size_checker.shape[1]
+        # =============================================
+        
+        num_hidden_layers = len(hparams['n_hidden'])
+        self.dense = [
+            nn.Sequential(
+                nn.Linear(flatten_output_size, hparams['n_hidden'][0]),
+                nn.LeakyReLU()
+            )
+        ]
+        if num_hidden_layers > 1:
+            self.dense += [
+                nn.Sequential(
+                    nn.Linear(hparams['n_hidden'][i-1], hparams['n_hidden'][i]),
+                    nn.LeakyReLU()
+                )
+                for i in range(1, num_hidden_layers)
+            ]
+        for i in range(len(self.dense)):
+            setattr(self, 'dense_'+str(i), self.dense[i])
 
         ########################################################################
         #                           END OF YOUR CODE                           #
@@ -45,8 +83,11 @@ class KeypointModel(pl.LightningModule):
         # corresponding predicted keypoints                                    #
         ########################################################################
 
-
-        pass
+        for c in self.conv2d:
+            x = c(x)
+        x = self.flatten(x)
+        for d in self.dense:
+            x = d(x)
 
         ########################################################################
         #                           END OF YOUR CODE                           #
