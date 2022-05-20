@@ -30,7 +30,9 @@ class Encoder(nn.Module):
             nn.Linear(input_size, self.hparams['n_hidden'][0]),
             nn.Linear(self.hparams['n_hidden'][0], self.hparams['n_hidden'][1]),
             nn.LeakyReLU(),
-            nn.Linear(self.hparams['n_hidden'][1], latent_dim),
+            nn.Linear(self.hparams['n_hidden'][1], self.hparams['n_hidden'][2]),
+            nn.LeakyReLU(),
+            nn.Linear(self.hparams['n_hidden'][2], latent_dim),
         )
 
         ########################################################################
@@ -56,7 +58,9 @@ class Decoder(nn.Module):
         ########################################################################
 
         self.decoder = nn.Sequential(
-            nn.Linear(latent_dim, self.hparams['n_hidden'][1]),
+            nn.Linear(latent_dim, self.hparams['n_hidden'][2]),
+            nn.Linear(self.hparams['n_hidden'][2], self.hparams['n_hidden'][1]),
+            nn.LeakyReLU(),
             nn.Linear(self.hparams['n_hidden'][1], self.hparams['n_hidden'][0]),
             nn.LeakyReLU(),
             nn.Linear(self.hparams['n_hidden'][0], output_size)
